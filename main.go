@@ -12,73 +12,82 @@ import (
 
 //关闭程序
 var clo chan bool = make(chan bool)
-
 var cfg *config.Config
-
-//var result chan string = make(chan string)
+var result chan string = make(chan string)
 var scanResultOld string
-
 var scanResult string
+var thread chan int = make(chan int)
+var nowThread int
 
 func RunScan(ipports []string) {
 	for {
 		scanResult = ""
+		nowThread = len(ipports)
+		fmt.Println("len(ipports)", nowThread)
 		for i := 0; i < len(ipports); i++ {
-			_, err := net.Dial("tcp", ipports[i])
-			if err != nil {
-				scanResult += (ipports[i] + "\r\n")
-				fmt.Println(scanResult)
-			}
-			// go scan(ipports[i])
+			go scan(ipports[i])
 		}
 
+		<-thread
 		fmt.Println("一次循环结束", scanResult)
-
-		if len(scanResult) > 0 && scanResult != scanResultOld {
-			fmt.Println("scanResult", scanResult)
+		if len(scanResult) > 0 && !StringSliceReflectEqual(scanResult, scanResultOld) {
 			sendEmail("提醒", "端口不开放:"+scanResult)
 		}
 		scanResultOld = scanResult
-		//	result <- scanResult
+
 		time.Sleep((time.Duration)(cfg.IntervalTime) * time.Minute)
 	}
 }
 
-/*
+func StringSliceReflectEqual(a, b string) bool {
+	//	return reflect.DeepEqual(strings.Split(a, ","), strings.Split(b, ","))
+	return len(a) == len(b)
+}
+
 func scan(address string) {
 	_, err := net.Dial("tcp", address)
 	if err != nil {
-		fmt.Println(address, err.Error())
+		fmt.Println(address)
+		result <- address
+	}
+
+	nowThread--
+	fmt.Println("nowThread", nowThread)
+	if nowThread == 0 {
+		time.Sleep(time.Second)
+		thread <- 0
 	}
 }
 
 func getResult() {
-	s, ok := <-result
-	for ok {
-		fmt.Println("端口不开放", s)
-		s, ok = <-result
+	for {
+		s, ok := <-result
+		if ok {
+			scanResult += (string)(s + ";")
+		} else {
+			fmt.Println("err: ", ok)
+		}
 	}
+	fmt.Println("/r/n err 退出了 getResult /r/n")
 }
-*/
+
 func SendToEmail() {
 	for {
-		//	scanResultOld = scanResult
 		if len(scanResultOld) > 0 {
 			fmt.Println("scanResultOld", scanResultOld)
 			sendEmail("提醒", "端口不开放:"+scanResultOld)
 		}
 		time.Sleep((time.Duration)(cfg.SendTime) * time.Minute)
-		//	scanResultOld=""
 	}
 }
 
 func main() {
 	configpath := flag.String("f", "config.toml", "configfile")
 	cfg = config.InitCfg(*configpath)
-	fmt.Println(cfg)
 
 	go RunScan(cfg.IpPosts)
 	go SendToEmail()
+	go getResult()
 
 	//等待退出指令
 	<-clo
@@ -104,9 +113,8 @@ func sendEmail(title, body string) {
 	m.SetBody("text/html", body)  // 正文
 
 	d := gomail.NewPlainDialer(cfg.Host, (int)(cfg.PostEmail), cfg.FromEmail, cfg.FromEmailPsw) // 发送邮件服务器、端口、发件人账号、发件人密码
-	fmt.Println("发送邮件")
+	fmt.Println("发送邮件", body)
 	if err := d.DialAndSend(m); err != nil {
-		//	panic(err)
 		fmt.Println("邮件发送失败", err)
 	} else {
 		fmt.Println("邮件发送成功")
