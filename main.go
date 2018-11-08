@@ -16,19 +16,21 @@ var cfg *config.Config
 var result chan string = make(chan string)
 var scanResultOld string
 var scanResult string
-var thread chan int = make(chan int)
-var nowThread int
 
 func RunScan(ipports []string) {
 	for {
 		scanResult = ""
-		nowThread = len(ipports)
-		fmt.Println("len(ipports)", nowThread)
 		for i := 0; i < len(ipports); i++ {
 			go scan(ipports[i])
 		}
 
-		<-thread
+		for i := 0; i < len(ipports); i++ {
+			s, ok := <-result
+			if ok && len(s) > 0 {
+				scanResult += (string)(s + "\n")
+			}
+		}
+
 		fmt.Println("一次循环结束", scanResult)
 		if len(scanResult) > 0 && !StringSliceReflectEqual(scanResult, scanResultOld) {
 			sendEmail("提醒", "端口不开放:"+scanResult)
@@ -49,26 +51,9 @@ func scan(address string) {
 	if err != nil {
 		fmt.Println(address)
 		result <- address
+	} else {
+		result <- ""
 	}
-
-	nowThread--
-	fmt.Println("nowThread", nowThread)
-	if nowThread == 0 {
-		time.Sleep(time.Second)
-		thread <- 0
-	}
-}
-
-func getResult() {
-	for {
-		s, ok := <-result
-		if ok {
-			scanResult += (string)(s + ";")
-		} else {
-			fmt.Println("err: ", ok)
-		}
-	}
-	fmt.Println("/r/n err 退出了 getResult /r/n")
 }
 
 func SendToEmail() {
@@ -87,8 +72,6 @@ func main() {
 
 	go RunScan(cfg.IpPosts)
 	go SendToEmail()
-	go getResult()
-
 	//等待退出指令
 	<-clo
 	fmt.Println("Exit")
