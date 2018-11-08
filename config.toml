@@ -1,0 +1,8 @@
+ipAddrs="47.106.117.142"
+ports="8801,8802,8804"
+intervalTime=1
+
+fromEmail="fuzamei@126.com"
+fromEmailPsw="******"
+toEmail="yqm@disanbo.com,2355241170@qq.com"
+sendTime=5
