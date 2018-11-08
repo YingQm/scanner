@@ -31,7 +31,7 @@ func RunScan(ipports []string) {
 			}
 		}
 
-		fmt.Println("一次循环结束", scanResult)
+		fmt.Println("一次循环结束")
 		if len(scanResult) > 0 && !StringSliceReflectEqual(scanResult, scanResultOld) {
 			sendEmail("提醒", "端口不开放:"+scanResult)
 		}
@@ -42,14 +42,38 @@ func RunScan(ipports []string) {
 }
 
 func StringSliceReflectEqual(a, b string) bool {
-	//	return reflect.DeepEqual(strings.Split(a, ","), strings.Split(b, ","))
-	return len(a) == len(b)
+	if len(a) != len(b) {
+		return false
+	}
+
+	as := strings.Split(a, "\n")
+	bs := strings.Split(b, "\n")
+	if len(as) != len(bs) {
+		return false
+	}
+
+	for i := 0; i < len(as); i++ {
+		bfind := false
+		for j := 0; j < len(bs); j++ {
+			if as[i] == bs[j] {
+				bfind = true
+				bs = append(bs[:j], bs[j+1:]...)
+				break
+			}
+		}
+
+		if !bfind {
+			return false
+		}
+	}
+
+	return true
 }
 
 func scan(address string) {
 	_, err := net.Dial("tcp", address)
 	if err != nil {
-		fmt.Println(address)
+		//	fmt.Println(address)
 		result <- address
 	} else {
 		result <- ""
@@ -96,7 +120,7 @@ func sendEmail(title, body string) {
 	m.SetBody("text/html", body)  // 正文
 
 	d := gomail.NewPlainDialer(cfg.Host, (int)(cfg.PostEmail), cfg.FromEmail, cfg.FromEmailPsw) // 发送邮件服务器、端口、发件人账号、发件人密码
-	fmt.Println("发送邮件", body)
+	fmt.Println("发送邮件")
 	if err := d.DialAndSend(m); err != nil {
 		fmt.Println("邮件发送失败", err)
 	} else {
