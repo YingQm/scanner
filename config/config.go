@@ -16,16 +16,20 @@ func InitCfg(path string) *Config {
 		os.Exit(0)
 	}
 
-	ips := processIp(cfg.IpAddrs)
-	ports := processPort(cfg.Ports)
-	ipports := make([]string, 0)
-	for i := 0; i < len(ips); i++ {
-		for j := 0; j < len(ports); j++ {
-			ipports = append(ipports, ips[i]+":"+strconv.Itoa(ports[j]))
-		}
+	if len(cfg.IpPosts) == 0 && len(cfg.EthServiceAddr) == 0 {
+		panic("配置文件错误，没有配置需要监控的内容！")
 	}
-	cfg.IpPosts = ipports
 
+	/*	ips := processIp(cfg.IpAddrs)
+		ports := processPort(cfg.Ports)
+		ipports := make([]string, 0)
+		for i := 0; i < len(ips); i++ {
+			for j := 0; j < len(ports); j++ {
+				ipports = append(ipports, ips[i]+":"+strconv.Itoa(ports[j]))
+			}
+		}
+		cfg.IpPosts = ipports
+	*/
 	if cfg.IntervalTime < 1 {
 		cfg.IntervalTime = 1
 	}

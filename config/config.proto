@@ -3,21 +3,24 @@ syntax = "proto3";
 package config;
 
 message Config{
-    // 扫描的IP地址，多个可用半角逗号","隔开，最多支持10个
-    string  ipAddrs         = 1;
-    // 扫描的端口号，多个可用半角逗号","隔开，最多支持10个
-    string  ports           = 2;
+    // IP地址和端口的组合，最多100个
+    repeated string ipPosts = 1;
     // 扫描的间隔时间, 单位分钟，默认1分钟
-    int64   intervalTime    = 3;
+    int64   intervalTime    = 2;
+
     // 发送者邮箱
-    string  fromEmail       = 4;
+    string  fromEmail       = 3;
     // 发送者邮件的授权码，发送者邮箱需要开启"POP3/SMTP服务"，获取授权码
-    string  fromEmailPsw    = 5;
+    string  fromEmailPsw    = 4;
     // 接收者邮箱，多个可用半角逗号","隔开
-    string  toEmail         = 6;
-    string  host            = 7;
-    int32   postEmail       = 8;
+    string  toEmail         = 5;
+    string  host            = 6;
+    int32   postEmail       = 7;
     // 如果需要发送的信息相同，间隔一段时间再发送，默认60，单位分钟
-    int64   sendTime        = 9;
-    repeated string ipPosts = 10;
+    int64   sendTime        = 8;
+
+    // eth 的服务器IP地址
+    repeated string ethServiceAddr  = 9;
+    // dcr 的服务器IP地址 暂时不需要
+    repeated string dcrServiceAddr  = 10;
 }
