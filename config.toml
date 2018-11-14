@@ -1,9 +1,7 @@
-ipPosts=["47.106.117.142:8801","47.106.117.142:8802","47.106.117.142:8804"]
+ipPosts=["45.106.116.142:8801","47.116.117.143:8802"]
 intervalTime=1
 
 fromEmail="fuzamei@126.com"
 fromEmailPsw="授权码"
 toEmail="yqm@disanbo.com,2355241170@qq.com"
 sendTime=10
-
-ethServiceAddr = ["http://47.106.117.142:8801","http://39.107.60.254:8545","http://39.107.57.133:8545"]
