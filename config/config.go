@@ -3,28 +3,19 @@ package config
 import (
 	"fmt"
 	tml "github.com/BurntSushi/toml"
+	"gitlab.33.cn/wallet/monitor/types"
 	"net"
 	"os"
 	"strconv"
 	"strings"
 )
 
-func InitCfg(path string) *Config {
-	var cfg Config
+func InitCfg(path string) *types.Config {
+	var cfg types.Config
 	if _, err := tml.DecodeFile(path, &cfg); err != nil {
 		fmt.Println(err)
 		os.Exit(0)
 	}
-
-	ips := processIp(cfg.IpAddrs)
-	ports := processPort(cfg.Ports)
-	ipports := make([]string, 0)
-	for i := 0; i < len(ips); i++ {
-		for j := 0; j < len(ports); j++ {
-			ipports = append(ipports, ips[i]+":"+strconv.Itoa(ports[j]))
-		}
-	}
-	cfg.IpPosts = ipports
 
 	if cfg.IntervalTime < 1 {
 		cfg.IntervalTime = 1

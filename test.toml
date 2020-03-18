@@ -3,6 +3,6 @@ ports="8801,8802,8803,8804,8800,8805,8806,8807,8809,8810,8888"
 intervalTime=1
 
 fromEmail="fuzamei@126.com"
-fromEmailPsw="******"
+fromEmailPsw="fzm123456"
 toEmail="yqm@disanbo.com,2355241170@qq.com"
 sendTime=5
