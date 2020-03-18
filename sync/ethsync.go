@@ -1,11 +1,22 @@
 package sync
 
 import (
+<<<<<<< HEAD
 	"errors"
 	"fmt"
 	"github.com/bitly/go-simplejson"
 	"gitlab.33.cn/wallet/monitor/types"
 	"math/big"
+=======
+	"crypto/tls"
+	"errors"
+	"fmt"
+	"github.com/bitly/go-simplejson"
+	"io"
+	"io/ioutil"
+	"math/big"
+	"net/http"
+>>>>>>> 43b7f57b001bf47c96bca9ea10c9a48e391176fb
 	"strings"
 )
 
@@ -22,7 +33,11 @@ func EthSync(ServiceAddr []string) string {
 		if err != nil {
 			result += fmt.Sprintf("%s GetBlockHeight err %s \n", ServiceAddr[i], err.Error())
 		} else if heightMain > height && heightMain-height > 12 {
+<<<<<<< HEAD
 			result += fmt.Sprintf("%s %d height behind, heightMain=%d height=%d \n", ServiceAddr[i], heightMain-height, heightMain, height)
+=======
+			result += fmt.Sprintf("%s %d levels behind, heightMain=%d height=%d \n", ServiceAddr[i], heightMain-height, heightMain, height)
+>>>>>>> 43b7f57b001bf47c96bca9ea10c9a48e391176fb
 		}
 	}
 
@@ -31,7 +46,11 @@ func EthSync(ServiceAddr []string) string {
 
 func getEthBlockHeight(url string) (uint64, error) {
 	postdata := fmt.Sprintf(`{"id":1, "jsonrpc":"2.0","method":"eth_blockNumber", "params":[]}`)
+<<<<<<< HEAD
 	resp, err := SendToServerTls("POST", url, strings.NewReader(postdata))
+=======
+	resp, err := sendToServerTls("POST", url, strings.NewReader(postdata))
+>>>>>>> 43b7f57b001bf47c96bca9ea10c9a48e391176fb
 	if err != nil {
 		return 0, err
 	}
@@ -49,12 +68,16 @@ func getEthBlockHeight(url string) (uint64, error) {
 		if !ok {
 			return 0, errors.New("hextodec err")
 		}
+<<<<<<< HEAD
 		fmt.Printf("ETH %s getEthBlockHeight respone:%d\n", url, bn.Uint64())
+=======
+>>>>>>> 43b7f57b001bf47c96bca9ea10c9a48e391176fb
 		return bn.Uint64(), nil
 	}
 	return 0, errors.New("GetBlockHeight Err")
 }
 
+<<<<<<< HEAD
 func EthrumSync(serviceAddr []string, mainAddr string, maxdiff int64) []types.Message {
 	var msgArr []types.Message
 	if mainAddr == "" {
@@ -83,4 +106,32 @@ func EthrumSync(serviceAddr []string, mainAddr string, maxdiff int64) []types.Me
 		}
 	}
 	return msgArr
+=======
+func sendToServerTls(method, url string, body io.Reader) ([]byte, error) {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
+	request, err := http.NewRequest(method, url, body)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+	request.Close = true
+	resp, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	rbs, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	return rbs, nil
+>>>>>>> 43b7f57b001bf47c96bca9ea10c9a48e391176fb
 }

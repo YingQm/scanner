@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #检测的时间间隔(单位分钟)
 intervalTime=5
 omniuser="fuzamei"
@@ -41,3 +42,12 @@ dbName="monitor"
 nodePortTable="nodePortInfo"
 #表名 要检查节点同步高度的服务器表
 nodeSyncTable="nodeSyncInfo"
+=======
+ipPosts=["45.106.116.142:8801","47.116.117.143:8802"]
+intervalTime=1
+
+fromEmail="fuzamei@126.com"
+fromEmailPsw="授权码"
+toEmail="yqm@disanbo.com,2355241170@qq.com"
+sendTime=10
+>>>>>>> 43b7f57b001bf47c96bca9ea10c9a48e391176fb
